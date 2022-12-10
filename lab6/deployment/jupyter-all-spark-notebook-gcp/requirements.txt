@@ -1,4 +1,1 @@
-scikit-learn
-pandas
-pyarrow
-google-cloud
+flask
