@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, Response, request, render_template, flash, redirect
 
 from resources.data_management import DataManagement
-import requests
 import sys
 import os
 import json
