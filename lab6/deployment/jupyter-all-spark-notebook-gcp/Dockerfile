@@ -16,7 +16,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy all files in Batch_upload local host directory to Docker container
-COPY . .
+COPY /batch_upload .
 
 # Expose the port that our app runs in
 EXPOSE 5000
