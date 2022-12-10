@@ -23,6 +23,7 @@ services:
     container_name: spark-driver-app
     user: root
     ports:
+      - "5000:5000"
       - "8888:8888"
       - "4040-4050:4040-4050"
     environment:
