@@ -1,0 +1,17 @@
+<html>
+    <body>
+        <h1>World Cup batch data ingestion</h1>
+        <h2>Fixtures</h2>
+        <form enctype="multipart/form-data" action="/upload_fixture_data" method="POST">
+            <label for="fixture_data">Fixture data:</label>
+            <input type="file" id="fixture_data" name="fixture_data" accept=".json" placeholder="Fixture data"> <br>
+            <p><input type='submit' value='Upload'/></p>
+        </form>
+        <h2>Statistics</h2>
+        <form enctype="multipart/form-data" action="/upload_statistics_data" method="POST">
+            <label for="statistics_data">Statistics data:</label>
+            <input type="file" id="statistics_data" name="statistics_data" accept=".json" placeholder="Statistics data"> <br>
+            <p><input type='submit' value='Upload'/></p>
+        </form>
+    </body>
+</html>
