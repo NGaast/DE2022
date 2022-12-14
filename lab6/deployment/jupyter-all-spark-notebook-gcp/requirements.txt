@@ -1,2 +1,3 @@
+pyspark
 flask
 google-cloud-storage
