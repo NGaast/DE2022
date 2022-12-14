@@ -5,6 +5,8 @@ from pyspark.sql.functions import explode, split, concat, col, lit, array, udf, 
 from pyspark.sql.types import StructType, StructField, LongType, StringType, DoubleType, DateType, TimestampType
 from pyspark.sql import Window as W
 
+import sys
+
 class SparkManager:
 
     def __init__(self):
@@ -104,3 +106,5 @@ class SparkManager:
 
         # Build Teams table
         teams_table = response_df.select('response.teams.away.id', 'response.teams.away.name').distinct().sort('id')
+
+        teams_table.show()
