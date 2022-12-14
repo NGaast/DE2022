@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, Response, request, render_template, flash, redirect
 
+from resources.spark_manager import SparkManager
+
 from resources.data_management import DataManagement
 import sys
 import os
@@ -35,8 +37,8 @@ def upload_fixtures_data():
             sys.stdout.flush()
             return redirect(request.url)
 
-        json_format = json.load(data_file)
-        data_manager.store_json(json_format, "fixtures.json")
+        spark_manager = SparkManager()
+        spark_manager.spark_init()
 
         print("Succesfully stored data", file=sys.stdout)
         sys.stdout.flush()
