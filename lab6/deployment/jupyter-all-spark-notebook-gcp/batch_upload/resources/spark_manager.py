@@ -28,13 +28,79 @@ class SparkManager:
         conf.set("fs.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem")
         conf.set("fs.AbstractFileSystem.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS")
 
-    def load_fixture_data(self):
+    def build_data_from_json(self, json_format):
         # Load data into DataFrame
-        self.df = self.spark.read.format("json") \
+        df = self.spark.read.format("json") \
                                 .option("inferSchema", "true") \
                                 .option("multiLine", "true") \
-                                .load(f'{self.google_cloud_storage_path}fixtures.json')
+                                .load(json_format)
 
-    def explode_json(self):
         response_df = df.withColumn('response', explode('response')).select('response')
-        return reponse_df
+
+        # Fetch all features
+        fixture_table = response_df.select( \
+                        col('response.fixture.id'), \
+                        col('response.league.id').alias('league_id'), \
+                        split(col('response.fixture.date'), 'T').getItem(0).cast(DateType()).alias('date'), \
+                        split(col('response.fixture.date'), 'T').getItem(1).cast(TimestampType()).alias('time'), \
+                        'response.fixture.referee', \
+                        col('response.teams.away.id').alias('away_id'), \
+                        col('response.teams.home.id').alias('home_id'), \
+                        'response.league.round', \
+                        'response.league.season', \
+                        # 'response.fixture.venue.id', \
+                        col('response.score.halftime.home').alias('halftime_home'), \
+                        col('response.score.halftime.away').alias('halftime_away'), \
+                        col('response.score.fulltime.home').alias('fulltime_home'), \
+                        col('response.score.fulltime.away').alias('fulltime_away'), \
+                        col('response.score.extratime.home').alias('extratime_home'), \
+                        col('response.score.extratime.away').alias('extratime_away'), \
+                        col('response.score.penalty.home').alias('penalty_home'), \
+                        col('response.score.penalty.away').alias('penalty_away'))
+
+        # Build Round table
+        window_rounds = W.orderBy('round')
+        (
+            fixture_table
+            .withColumn('round_id', dense_rank().over(window_rounds))
+        )
+
+        window_rounds = W.orderBy('round')
+
+        fixture_table = fixture_table.withColumn('id', dense_rank().over(window_rounds))
+
+        rounds_table = fixture_table.select('id', 'round').distinct()
+
+        # Build Referee table
+        window_referee = W.orderBy('referee')
+        (
+            fixture_table
+            .withColumn('referee_id', dense_rank().over(window_referee))
+        )
+
+        window_referee = W.orderBy('referee')
+
+        fixture_table = fixture_table.withColumn('referee_id', dense_rank().over(window_referee))
+
+        referee_table = fixture_table.select('referee_id', 'referee').distinct()
+
+        # Build Season table
+        window_season = W.orderBy('season')
+        (
+            fixture_table
+            .withColumn('season_id', dense_rank().over(window_season))
+        )
+
+        window_season = W.orderBy('season')
+
+        fixture_table = fixture_table.withColumn('season_id', dense_rank().over(window_season))
+
+        referee_table = fixture_table.select('season_id', 'season').distinct()
+
+        # Build Fixture table
+        fixture_table = fixture_table.drop('referee')
+        fixture_table = fixture_table.drop('round')
+        fixture_table = fixture_table.drop('season')
+
+        # Build Teams table
+        teams_table = response_df.select('response.teams.away.id', 'response.teams.away.name').distinct().sort('id')

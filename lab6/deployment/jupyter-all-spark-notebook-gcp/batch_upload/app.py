@@ -37,13 +37,14 @@ def upload_fixtures_data():
             return redirect(request.url)
 
         json_format = json.load(data_file)
-        data_manager.store_json(json_format, "fixtures.json")
+        # data_manager.store_json(json_format, "fixtures.json")
 
         print("Succesfully stored data", file=sys.stdout)
         sys.stdout.flush()
 
         spark_manager = SparkManager()
         spark_manager.spark_init()
+        spark_manager.build_data_from_json(json_format)
 
         return redirect('/data_upload')
     return redirect('/data_upload')
