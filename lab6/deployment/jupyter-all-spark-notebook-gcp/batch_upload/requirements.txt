@@ -1,0 +1,6 @@
+flask
+pandas
+numpy
+sklearn
+google-cloud-storage
+google-cloud-aiplatform[pipelines]
