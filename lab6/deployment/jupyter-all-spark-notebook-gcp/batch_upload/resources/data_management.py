@@ -1,13 +1,7 @@
-import argparse
 import json
-
-from typing_extensions import Self
-from google.cloud import storage
-import google.cloud.aiplatform as aip
-import pandas as pd
 import sys
 
-
+from google.cloud import storage
 
 class DataManagement:
 
